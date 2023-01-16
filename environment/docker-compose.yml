@@ -1,6 +1,21 @@
 version: "3.9"
 
 services:
+  spring-elasticsearch:
+    build: ..
+    hostname: spring-elasticsearch
+    container_name: spring-elasticsearch
+    ports:
+      - target: 8080
+        published: 8080
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
+    networks:
+      - spring-elk
 
   elasticsearch:
     image: elasticsearch:8.6.0
@@ -15,11 +30,42 @@ services:
     healthcheck:
       test: curl -u elastic:elastic -s -f elasticsearch:9200/_cat/health >/dev/null || exit 1
       interval: 10s
-      timeout: 5s
+      timeout: 10s
       retries: 5
     ports:
       - target: 9200
         published: 9200
+    networks:
+      - spring-elk
+
+  logstash:
+    image: logstash:8.6.0
+    container_name: logstash
+    hostname: logstash
+    ports:
+      - target: 25826
+        published: 25826
+      - target: 5044
+        published: 5044
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline               # Pipeline configuration
+    depends_on:
+      elasticsearch:
+          condition: service_healthy
+    networks:
+      - spring-elk
+
+  filebeat:
+    image: elastic/filebeat:8.6.0
+    container_name: filebeat
+    volumes:
+      - ./filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro           # Docker logs
+      - /var/run/docker.sock:/var/run/docker.sock:ro                       # Additional information about containers
+      - filebeat_data:/usr/share/filebeat/data:rw                        # Persistence data
+    user: root                                                             # Allow access to log files and docker.sock
+    depends_on:
+      - logstash
     networks:
       - spring-elk
 
@@ -39,6 +85,8 @@ volumes:
   es_data:
     driver: local
     name: ${ES_DATA}
+  filebeat_data:
+    driver: local
 
 networks:
   spring-elk:
