@@ -48,7 +48,7 @@ services:
       - target: 5044
         published: 5044
     volumes:
-      - ./logstash/pipeline:/usr/share/logstash/pipeline               # Pipeline configuration
+      - ./logstash:/usr/share/logstash/pipeline               # Pipeline configuration
     depends_on:
       elasticsearch:
           condition: service_healthy
