@@ -23,6 +23,10 @@ This app is producing Twin Peaks quotes to the Elasticsearch by rest endpoint.
 - Logstash is configured in `logstash/logstash.conf`
 
 ---
+> #### Important notes:
+> - EFK(Elasticsearch + Fluentd + Kibana): https://docs.fluentd.org/v/0.12/container-deployment/docker-compose
+> - Spring boot *tracing* via micrometer is added to the logs.
+---
 #### Test scenario:
 
  1. Build project:

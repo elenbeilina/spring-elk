@@ -20,6 +20,17 @@
                     <loggerName/>
                     <threadName/>
                     <context/>
+                    <pattern>
+                        <omitEmptyFields>true</omitEmptyFields>
+                        <pattern>
+                            {
+                                "trace": {
+                                    "trace_id": "%X{traceId:-}",
+                                    "span_id": "%X{spanId:-}"
+                                }
+                            }
+                        </pattern>
+                    </pattern>
                     <stackTrace/>
                 </providers>
             </encoder>
@@ -28,10 +39,8 @@
         <root level="INFO">
             <appender-ref ref="jsonConsoleAppender"/>
         </root>
-
     </springProfile>
 
-    <!-- Log configuration for non-Docker profile -->
     <springProfile name="!logs">
 
         <property name="CONSOLE_LOG_PATTERN"
