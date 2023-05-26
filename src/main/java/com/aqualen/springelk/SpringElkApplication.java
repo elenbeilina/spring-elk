@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @Slf4j
 @SpringBootApplication
-//TODO:Add tracing info with micrometer
 public class SpringElkApplication {
 
   public static void main(String[] args) {
